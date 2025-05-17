@@ -26,3 +26,6 @@ __pycache__/
 # 系統檔案
 .DS_Store
 Thumbs.db
+
+# 忽略 images 資料夾
+images/
