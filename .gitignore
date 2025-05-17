@@ -1,0 +1,28 @@
+# Python 虛擬環境
+venv/
+
+# Python 編譯檔案
+*.pyc
+*.pyo
+__pycache__/
+
+# 日誌檔案
+*.log
+
+# VS Code 設定檔
+.vscode/
+
+# PyTorch 模型檔案
+*.pt
+*.pth
+
+# 暫存檔案
+*.tmp
+*.temp
+
+# Jupyter Notebook Checkpoints
+.ipynb_checkpoints/
+
+# 系統檔案
+.DS_Store
+Thumbs.db
