@@ -4,6 +4,12 @@ import torch.optim as optim
 import torch.nn.functional as F
 import os
 
+print("PyTorch 版本:", torch.__version__)
+print("CUDA 是否可用:", torch.cuda.is_available())
+if torch.cuda.is_available():
+    print("使用的 GPU:", torch.cuda.get_device_name(0))
+
+
 class Linear_QNet(nn.Module):
     def __init__(self, input_size, hidden_size, output_size):
         """
@@ -15,7 +21,8 @@ class Linear_QNet(nn.Module):
         """
         super().__init__()
         self.linear1 = nn.Linear(input_size, hidden_size)
-        self.linear2 = nn.Linear(hidden_size, output_size)
+        self.linear2 = nn.Linear(hidden_size, hidden_size)
+        self.linear3 = nn.Linear(hidden_size, output_size)
 
     def forward(self, x):
         """
@@ -26,7 +33,8 @@ class Linear_QNet(nn.Module):
         - 輸出張量
         """
         x = F.relu(self.linear1(x))
-        x = self.linear2(x)
+        x = F.relu(self.linear2(x))
+        x = self.linear3(x)
         return x
 
     def save(self, file_name='model.pth'):
@@ -67,11 +75,14 @@ class QTrainer:
         - next_state: 下一狀態
         - done: 是否結束
         """
-        # 將輸入轉換為張量
-        state = torch.tensor(state, dtype=torch.float)
-        next_state = torch.tensor(next_state, dtype=torch.float)
-        action = torch.tensor(action, dtype=torch.long)
-        reward = torch.tensor(reward, dtype=torch.float)
+
+        device = "cuda" if torch.cuda.is_available() else "cpu"
+
+        # 將輸入轉換為張量並移動到同一設備
+        state = torch.tensor(state, dtype=torch.float).to(device)
+        next_state = torch.tensor(next_state, dtype=torch.float).to(device)
+        action = torch.tensor(action, dtype=torch.long).to(device)
+        reward = torch.tensor(reward, dtype=torch.float).to(device)
 
         # 如果是單一樣本，調整維度
         if len(state.shape) == 1:

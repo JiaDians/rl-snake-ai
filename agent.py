@@ -18,6 +18,8 @@ class Agent:
         self.gamma = 0.9  # 折扣率
         self.memory = deque(maxlen=MAX_MEMORY)  # 經驗回放緩衝區
         self.model = Linear_QNet(11, 256, 3)  # 神經網路模型
+        
+        self.model = self.model.to('cuda' if torch.cuda.is_available() else 'cpu')  # 使用 GPU 或 CPU
         self.trainer = QTrainer(self.model, lr=LR, gamma=self.gamma)  # 訓練器
 
     def get_state(self, game):
@@ -89,7 +91,9 @@ class Agent:
             move = random.randint(0, 2)  # 隨機選擇動作
             final_move[move] = 1
         else:
-            state_tensor = torch.tensor(state, dtype=torch.float)
+            # 確保 state_tensor 和模型在同一設備上
+            device = "cuda" if torch.cuda.is_available() else "cpu"
+            state_tensor = torch.tensor(state, dtype=torch.float).to(device)  # 將張量移動到模型所在設備
             prediction = self.model(state_tensor)  # 使用模型預測
             move = torch.argmax(prediction).item()
             final_move[move] = 1
